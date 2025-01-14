@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamza Isa Ibrahim - Portfolio</title>   
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #eef2f3;
+        }
+        header {
+            background: #1E90FF;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        header img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+        }
+        header h1 {
+            margin: 1rem 0 0.5rem;
+            font-size: 2.5rem;
+        }
+        header p {
+            font-size: 1.2rem;
+        }
+        nav {
+            background: white;
+            border-bottom: 1px solid #ddd;
+            padding: 0.5rem 2rem;
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1E90FF;
+        }
+nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin: 0 1rem;
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+        }
+        nav ul li a:hover {
+            color: #1E90FF;
+            transition: color 0.3s;
+        }
+        nav .menu-icon {
+            display: none;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        nav ul.active {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        nav ul.active li {
+            margin: 0;
+            padding: 0.5rem 1rem;
+            text-align: left;
+        }
+        nav .menu-icon.active {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                flex-direction: column;
+            }
+            nav .menu-icon {
+                display: block;
+            }
+            nav ul.active {
+                display: block;
+            }
+}
+              
+/* Style for the content sections */
+        section {
+            padding: 20px;
+            margin-bottom: 40px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            height:content; /* Make sections large enough to scroll */
+            position: relative;
+        }
+
+
+h2 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 16px;
+}
+
+/* Style for the progress circle (smaller and more professional) */
+.progress-circle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    color: #007bff;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Checkmark style */
+.progress-circle.checked {
+    background-color: #007bff;
+    color: white;
+}
+
+        .skills, .projects, .experience, .education {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .skills div, .projects div, .experience div, .education div {
+            flex: 1 1 calc(50% - 2rem);
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 5px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            text-align: center;
+            background: #333;
+            color: white;
+            padding: 1rem 0;
+        }
+        footer a {
+            color: white;
+            margin: 0 1rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        footer img {
+            width: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                display: none;
+            }
+            nav ul.active {
+                display: flex;
+            }
+            nav .menu-icon {
+                display: block;
+            }
+        }
+        
+        
+        
+        
+
+      
+    </style>
+    <script>
+        function toggleMenu() {
+            const navLinks = document.querySelector('nav ul');
+            const menuIcon = document.querySelector('.menu-icon');
+            navLinks.classList.toggle('active');
+            menuIcon.classList.toggle('active');
+        }
+     
+   
+// Function to check if a section is in the viewport
+function isInViewport(section) {
+    const sectionTop = section.offsetTop;
+    const sectionBottom = sectionTop + section.offsetHeight;
+    return window.scrollY + window.innerHeight > sectionTop && window.scrollY < sectionBottom;
+}
+
+// Function to handle the view tracker
+function handleSectionView(section, progressCircle, timeout) {
+    if (isInViewport(section)) {
+        // If section is in view, start the timer
+        if (!progressCircle.classList.contains('checked')) {
+            timeout = setTimeout(() => {
+                progressCircle.classList.add('checked');
+                progressCircle.innerHTML = '✅'; // Add checkmark after viewing
+            }, 5000); // 5 seconds delay for showing checkmark
+        }
+    } else {
+        // If section is out of view, clear the timer and reset the circle
+        clearTimeout(timeout);
+        progressCircle.classList.remove('checked');
+        progressCircle.innerHTML = ''; // Reset the progress circle
+    }
+}
+
+let timeouts = []; // Array to store timeouts for each section
+
+// Event listener to track when sections are in the viewport
+window.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section');
+    const circles = document.querySelectorAll('.progress-circle');
+
+    sections.forEach((section, index) => {
+        const progressCircle = circles[index];
+        let timeout = timeouts[index] || null;
+
+        handleSectionView(section, progressCircle, timeout);
+
+        // Store the timeout ID for the current section
+        timeouts[index] = timeout;
+    });
+});
+
+     </script>
+</head>
+<body>
+
+<header>
+    <img src="https://i.ibb.co/HTtSGQV/IMG-20241119-WA0006.jpg" alt="Hamza Isa Ibrahim">
+    <h1>Hamza Isa Ibrahim</h1>
+    <p>Web Developer | Frontend Specialist | WordPress Expert</p>
+</header>
+
+<nav>
+    <div class="logo"></div>
+    <span class="menu-icon" onclick="toggleMenu()">☰</span>
+    <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+</nav>
+ 
+
+    <section id="about">
+        <h2>About Me</h2>
+<p>
+    I’m Hamza Isa Ibrahim, a passionate Web Developer and Digital Creator. I specialize in web development, particularly with advanced scripting languages like JavaScript, React, and WordPress customization. Beyond coding, I have a strong background in design, including logo creation and image editing, as well as AI-powered audio-visual projects. I’m committed to delivering exceptional digital solutions that are both functional and visually appealing.
+</p>
+
+        <div class="progress-circle" data-section-id="about"></div>     
+    </section>
+
+    <section id="skills">
+        <h2>Skills</h2>
+        <div class="skills">
+            <div>
+                <h3>Technical Skills</h3>
+                <ul>
+                    <li>HTML, CSS, JavaScript</li>
+                    <li>React, Bootstrap, jQuery</li>
+                    <li>WordPress Customization</li>
+                    <li>AI Audio & Visual Creation</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Creative Skills</h3>
+                <ul>
+                    <li>Logo Design</li>
+                    <li>Image Editing</li>
+                    <li>Project Management</li>
+                    <li>Consultation Services</li>
+                </ul>
+            </div>
+        </div>
+        <div class="progress-circle" data-section-id="skills"></div>
+    </section>
+
+    <section id="projects">
+        <h2>Projects</h2>
+        <div class="projects">
+            <div>
+                <h3>Personal Portfolio</h3>
+                <p>Designed and developed a responsive portfolio to showcase my work and skills. Built with HTML, CSS, and JavaScript.</p>
+            </div>
+            <div>
+                <h3>E-commerce Landing Page</h3>
+                <p>Created an interactive landing page for an e-commerce store with animations and responsive design using React and Bootstrap.</p>
+            </div>
+        </div>
+        <div class="progress-circle" data-section-id="projects"></div>
+    </section>
+
+    <section id="experience">
+        <h2>Experience</h2>
+        <div class="experience">
+            <div>
+                <h3>Frontend Developer</h3>
+                <p>Reliable Mentor W3Schools | 2023 - Present</p>
+                <p>Developed and maintained frontend code for client projects, ensuring responsive and user-friendly interfaces.</p>
+            </div>
+            <div>
+                <h3>Web Developer Intern</h3>
+                <p>Code Camp | 2022 - 2023</p>
+                <p>Assisted in building and testing web applications, gaining hands-on experience in real-world development scenarios.</p>
+            </div>
+        </div>
+        <div class="progress-circle" data-section-id="experience"></div>
+    </section>
+
+    <section id="education">
+        <h2>Education</h2>
+        <div class="education">
+            <div>
+                <h3>Certificate in Web Development</h3>
+                <p>Reliable Mentor W3Schools | 2022</p>
+                <p>Completed comprehensive training in web development, including frontend and backend technologies.</p>
+            </div>
+            <div>
+                <h3>Online Courses</h3>
+                <p>FreeCodeCamp | 2021</p>
+                <p>Completed various courses on web development, focusing on HTML, CSS, JavaScript, and React.</p>
+            </div>
+        </div>
+        <div class="progress-circle" data-section-id="education"></div>
+    </section>
+
+<section id="contact">
+    <h2>Contact Me</h2>
+    <p>Email: <a href="mailto:asadcont0@gmail.com"</i>contact me through gmail</a></p>
+    <p>LinkedIn: <a href="https://www.linkedin.com/in/hamza-isa-ibrahim-486b63311" target="_blank"> View Profile</a></p>
+</section>
+
+<footer>
+    <p>© 2025 Hamza Isa Ibrahim | All Rights Reserved</p>
+</footer>
+
+</body>
+</html>
