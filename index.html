@@ -188,12 +188,16 @@ p {
                 display: block;
             }
         }
-        
-        
-        
-        
 
-      
+
+      .vertical-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-width: 500px;
+      }
+    
+  
     </style>
     <script>
         function toggleMenu() {
@@ -252,7 +256,7 @@ window.addEventListener('scroll', () => {
 <body>
 
 <header>
-    <img src="https://i.ibb.co/HTtSGQV/IMG-20241119-WA0006.jpg" alt="Hamza Isa Ibrahim">
+    <img src="https://i.ibb.co/dmsHfZh/IMG-20250116-WA0005.jpg"alt="Hamza Isa Ibrahim">
     <h1>Hamza Isa Ibrahim</h1>
     <p>Web Developer | Frontend Specialist | WordPress Expert</p>
 </header>
@@ -355,9 +359,26 @@ window.addEventListener('scroll', () => {
     </section>
 
 <section id="contact">
-    <h2>Contact Me</h2>
-    <p>Email: <a href="mailto:asadcont0@gmail.com"</i>contact me through gmail</a></p>
-    <p>LinkedIn: <a href="https://www.linkedin.com/in/hamza-isa-ibrahim-486b63311" target="_blank"> View Profile</a></p>
+
+
+  <div class="form-container">
+    <h1>Contact Us</h1>
+
+
+
+
+    <form class="vertical-form" action="https://submit-form.com/T8OuEJlRe">
+      <label for="first-name">First name</label>
+      <input id="first-name" name="first-name" type="text" />
+      <label for="last-name">Last name</label>
+      <input id="last-name" name="last-name" type="text" />
+      <label for="message">Message</label>
+      <textarea id="message" name="message" cols="15" rows="5"></textarea>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+    <p>LinkedIn: <a href="https://www.linkedin.com/in/hamza-isa-ibrahim-486b63311" target="_blank">Click here</a> to view my linkedin Profile</p>
 </section>
 
 <footer>
