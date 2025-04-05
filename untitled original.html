@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engagement Portal</title>
+  <style>
+    /* === Global Styles === */
+    :root {
+      --primary: #3b82f6;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --gray: #6b7280;
+      --gold: #fbbf24;
+      --dark: #1f2937;
+      --header-height: 25vh;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f9fafb;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    /* === Auth Modal === */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      padding: 0.75rem;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray);
+      transition: all 0.2s;
+    }
+    
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .auth-form {
+      display: none;
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .auth-form input,
+    .auth-form select {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+    
+    .auth-form input:focus,
+    .auth-form select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .auth-form button {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+    
+    .auth-form button:hover {
+      background: #2563eb;
+    }
+    
+    /* === Header === */
+    header {
+      height: var(--header-height);
+      min-height: 180px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .stars-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      backdrop-filter: blur(5px);
+      font-size: 0.9rem;
+    }
+    
+    .stars-count {
+      font-weight: 700;
+    }
+    
+    .star-icon {
+      color: var(--gold);
+    }
+    
+    /* === Main Content === */
+    #app-content {
+      display: none;
+    }
+    
+    .container {
+      padding: 1rem;
+      position: relative;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 1rem;
+      position: relative;
+      overflow-x: auto;
+    }
+    
+    .tab-btn {
+      padding: 0.8rem 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray);
+      position: relative;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    
+    .tab-btn.active {
+      color: var(--primary);
+    }
+    
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+    
+    .content-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .content-section.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* === Task Cards === */
+    .task-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .task-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .task-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    }
+    
+    .task-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    
+    .task-number {
+      width: 30px;
+      height: 30px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 0.8rem;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    
+    .task-name {
+      font-size: 1rem;
+      font-weight: 600;
+      flex-grow: 1;
+    }
+    
+    .task-status {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.8rem;
+    }
+    
+    .status-pending {
+      background: #f3f4f6;
+      color: var(--gray);
+    }
+    
+    .status-verified {
+      background: #dcfce7;
+      color: var(--success);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn {
+      flex: 1;
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+    }
+    
+    .btn-disabled {
+      background: #e5e7eb !important;
+      color: #9ca3af !important;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .verified-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--success);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* === Survey Styles === */
+    .survey-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .survey-question {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+    
+    .survey-options {
+      margin-bottom: 1.5rem;
+    }
+    
+    .survey-option {
+      display: block;
+      margin-bottom: 0.8rem;
+      padding: 0.8rem;
+      background: #f3f4f6;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .survey-option:hover {
+      background: #e5e7eb;
+    }
+    
+    .survey-option input {
+      margin-right: 0.8rem;
+    }
+    
+    .survey-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+    
+    /* === Responsive Design === */
+    @media (max-width: 768px) {
+      header {
+        padding: 0.8rem;
+        min-height: 160px;
+      }
+      
+      .logo {
+        font-size: 1.3rem;
+      }
+      
+      .stars-container {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      
+      .task-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="signup">Sign Up</button>
+        <button class="auth-tab" data-tab="login">Login</button>
+      </div>
+
+      <!-- Signup Form -->
+      <form id="signup-form" class="auth-form active">
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required minlength="8">
+        <input type="text" id="full-name" placeholder="Full Name" required>
+        <select id="nationality" required>
+          <option value="">Select Country</option>
+          <option value="US">United States</option>
+          <option value="UK">United Kingdom</option>
+          <option value="NG">Nigeria</option>
+        </select>
+        <select id="gender" required>
+          <option value="">Select Gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="file" id="profile-picture" accept="image/*">
+        <button type="submit">Create Account</button>
+      </form>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button type="submit">Log In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App Content -->
+  <div id="app-content">
+    <header>
+      <div class="header-content">
+        <div class="logo">EngagementPortal</div>
+        <div class="stars-container">
+          <span class="stars-count" id="stars-count">0</span>
+          <span class="star-icon">★</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="tasks">Tasks</button>
+        <button class="tab-btn" data-tab="surveys">Surveys</button>
+      </div>
+
+      <!-- Tasks Section -->
+      <section class="content-section active" id="tasks-section">
+        <div class="task-container" id="tasks-container">
+          <!-- Tasks will be loaded here -->
+        </div>
+      </section>
+
+      <!-- Surveys Section -->
+      <section class="content-section" id="surveys-section">
+        <div class="survey-container" id="survey-container">
+          <div class="survey-question">How satisfied are you with our service?</div>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="survey-answer" value="5"> Very Satisfied
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="survey-answer" value="4"> Satisfied
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="survey-answer" value="3"> Neutral
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="survey-answer" value="2"> Dissatisfied
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="survey-answer" value="1"> Very Dissatisfied
+            </label>
+          </div>
+          <div class="survey-nav">
+            <button class="btn btn-primary" id="prev-question" disabled>Previous</button>
+            <button class="btn btn-primary" id="next-question">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
+  <script>
+    // =============================================
+    // Firebase Configuration and Initialization
+    // =============================================
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyA8742Bs5nzfmPd5PkkE4-G8oVJR-38Mrw",
+    authDomain: "engagement-portal-39346.firebaseapp.com",
+    databaseURL: "https://engagement-portal-39346-default-rtdb.firebaseio.com",
+    projectId: "engagement-portal-39346",
+    storageBucket: "engagement-portal-39346.appspot.com",
+    messagingSenderId: "119604507798",
+    appId: "1:119604507798:web:7201634d294fc1312bfeb7"
+};
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Firebase services
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // =============================================
+    // Application State
+    // =============================================
+    const state = {
+      currentUser: null,
+      userData: null,
+      userProgress: null,
+      currentTab: 'tasks',
+      tasks: [
+        { id: 'task1', title: 'Complete Profile Setup', description: 'Fill out your profile information' },
+        { id: 'task2', title: 'Watch Introduction Video', description: 'View our welcome video' },
+        { id: 'task3', title: 'Complete First Survey', description: 'Provide your initial feedback' }
+      ],
+      currentSurveyQuestion: 0,
+      surveyAnswers: []
+    };
+
+    // =============================================
+    // DOM Elements
+    // =============================================
+    const elements = {
+      authModal: document.getElementById('auth-modal'),
+      appContent: document.getElementById('app-content'),
+      starsCount: document.getElementById('stars-count'),
+      tasksContainer: document.getElementById('tasks-container'),
+      surveyContainer: document.getElementById('survey-container'),
+      tabButtons: document.querySelectorAll('.tab-btn'),
+      contentSections: document.querySelectorAll('.content-section')
+    };
+
+    // =============================================
+    // Authentication Functions
+    // =============================================
+    async function handleSignup(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
+      const fullName = document.getElementById('full-name').value;
+      const nationality = document.getElementById('nationality').value;
+      const gender = document.getElementById('gender').value;
+      const profilePicture = document.getElementById('profile-picture').files[0];
+
+      try {
+        // Create user with email/password
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        
+        // Upload profile picture if provided
+        let photoURL = null;
+        if (profilePicture) {
+          const storageRef = storage.ref(`profiles/${userCredential.user.uid}`);
+          await storageRef.put(profilePicture);
+          photoURL = await storageRef.getDownloadURL();
+        }
+
+        // Save user data to Firestore
+        await db.collection('users').doc(userCredential.user.uid).set({
+          email,
+          fullName,
+          nationality,
+          gender,
+          photoURL,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Initialize user progress
+        await db.collection('user_progress').doc(userCredential.user.uid).set({
+          totalStars: 0,
+          totalTasksCompleted: 0,
+          completedTasks: {},
+          completedSurveys: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Update UI
+        elements.authModal.style.display = 'none';
+        elements.appContent.style.display = 'block';
+        
+      } catch (error) {
+        alert(`Signup failed: ${error.message}`);
+        console.error("Signup error:", error);
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        elements.authModal.style.display = 'none';
+        elements.appContent.style.display = 'block';
+      } catch (error) {
+        alert(`Login failed: ${error.message}`);
+        console.error("Login error:", error);
+      }
+    }
+
+    // =============================================
+    // Task Management Functions
+    // =============================================
+    async function completeTask(taskId) {
+      try {
+        if (!state.currentUser) return;
+        
+        await db.collection('user_progress').doc(state.currentUser.uid).update({
+          [`completedTasks.${taskId}`]: true,
+          totalStars: firebase.firestore.FieldValue.increment(1),
+          totalTasksCompleted: firebase.firestore.FieldValue.increment(1),
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        renderTasks();
+      } catch (error) {
+        console.error("Error completing task:", error);
+      }
+    }
+
+    function renderTasks() {
+      elements.tasksContainer.innerHTML = '';
+      
+      state.tasks.forEach(task => {
+        const isCompleted = state.userProgress?.completedTasks?.[task.id] || false;
+        
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task-card';
+        taskElement.innerHTML = `
+          <div class="task-header">
+            <div class="task-number">${task.id.replace('task', '')}</div>
+            <div class="task-name">${task.title}</div>
+          </div>
+          <div class="task-status ${isCompleted ? 'status-verified' : 'status-pending'}">
+            ${isCompleted ? 'Verified' : 'Pending'}
+          </div>
+          <p>${task.description}</p>
+          <div class="btn-group">
+            <button class="btn ${isCompleted ? 'btn-disabled' : 'btn-primary'}" 
+              data-task="${task.id}" ${isCompleted ? 'disabled' : ''}>
+              ${isCompleted ? 'Task Completed' : 'Start Task'}
+            </button>
+            <button class="btn ${isCompleted ? 'btn-disabled' : 'btn-secondary'}" 
+              data-verify="${task.id}" ${isCompleted ? 'disabled' : ''}>
+              Verify Task
+            </button>
+          </div>
+          ${isCompleted ? '<div class="verified-badge">✓</div>' : ''}
+        `;
+        
+        elements.tasksContainer.appendChild(taskElement);
+      });
+
+      // Add event listeners to task buttons
+      document.querySelectorAll('[data-task]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const taskId = e.target.getAttribute('data-task');
+          startTask(taskId);
+        });
+      });
+
+      document.querySelectorAll('[data-verify]').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const taskId = e.target.getAttribute('data-verify');
+          verifyTask(taskId);
+        });
+      });
+    }
+
+    function startTask(taskId) {
+      console.log(`Starting task ${taskId}`);
+      // In a real app, you would track start time and show the task content
+    }
+
+    async function verifyTask(taskId) {
+      try {
+        // Simulate time spent on task (minimum 30 seconds)
+        const timeSpent = Math.floor(Math.random() * 60) + 30; // 30-90 seconds
+        
+        await completeTask(taskId);
+        alert(`Task verified! You spent ${timeSpent} seconds on this task.`);
+      } catch (error) {
+        alert(`Verification failed: ${error.message}`);
+      }
+    }
+
+    // =============================================
+    // Survey Functions
+    // =============================================
+    function renderSurveyQuestion(index) {
+      const questions = [
+        "How satisfied are you with our service?",
+        "How easy was it to use our platform?",
+        "How likely are you to recommend us to others?"
+      ];
+
+      elements.surveyContainer.innerHTML = `
+        <div class="survey-question">${questions[index]}</div>
+        <div class="survey-options">
+          <label class="survey-option">
+            <input type="radio" name="survey-answer" value="5"> Very Satisfied
+          </label>
+          <label class="survey-option">
+            <input type="radio" name="survey-answer" value="4"> Satisfied
+          </label>
+          <label class="survey-option">
+            <input type="radio" name="survey-answer" value="3"> Neutral
+          </label>
+          <label class="survey-option">
+            <input type="radio" name="survey-answer" value="2"> Dissatisfied
+          </label>
+          <label class="survey-option">
+            <input type="radio" name="survey-answer" value="1"> Very Dissatisfied
+          </label>
+        </div>
+        <div class="survey-nav">
+          <button class="btn ${index === 0 ? 'btn-disabled' : 'btn-primary'}" 
+            id="prev-question" ${index === 0 ? 'disabled' : ''}>
+            Previous
+          </button>
+          <button class="btn ${index === questions.length - 1 ? 'btn-success' : 'btn-primary'}" 
+            id="next-question">
+            ${index === questions.length - 1 ? 'Submit Survey' : 'Next'}
+          </button>
+        </div>
+      `;
+
+      // Set up event listeners
+      document.getElementById('prev-question').addEventListener('click', () => {
+        if (state.currentSurveyQuestion > 0) {
+          state.currentSurveyQuestion--;
+          renderSurveyQuestion(state.currentSurveyQuestion);
+        }
+      });
+
+      document.getElementById('next-question').addEventListener('click', () => {
+        const selectedOption = document.querySelector('input[name="survey-answer"]:checked');
+        if (!selectedOption) {
+          alert('Please select an answer');
+          return;
+        }
+
+        state.surveyAnswers[state.currentSurveyQuestion] = selectedOption.value;
+
+        if (state.currentSurveyQuestion < questions.length - 1) {
+          state.currentSurveyQuestion++;
+          renderSurveyQuestion(state.currentSurveyQuestion);
+        } else {
+          submitSurvey();
+        }
+      });
+    }
+
+    async function submitSurvey() {
+      try {
+        if (!state.currentUser) return;
+        
+        await db.collection('user_progress').doc(state.currentUser.uid).update({
+          totalStars: firebase.firestore.FieldValue.increment(1),
+          totalSurveysCompleted: firebase.firestore.FieldValue.increment(1),
+          [`completedSurveys.${Date.now()}`]: state.surveyAnswers,
+          lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert('Survey submitted successfully! You earned 1 star.');
+        state.currentSurveyQuestion = 0;
+        state.surveyAnswers = [];
+        renderSurveyQuestion(0);
+      } catch (error) {
+        console.error("Error submitting survey:", error);
+        alert('Failed to submit survey. Please try again.');
+      }
+    }
+
+    // =============================================
+    // UI Functions
+    // =============================================
+    function switchTab(tabId) {
+      // Update active tab button
+      elements.tabButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      });
+
+      // Show corresponding content section
+      elements.contentSections.forEach(section => {
+        section.classList.toggle('active', section.id === `${tabId}-section`);
+      });
+
+      state.currentTab = tabId;
+    }
+
+    function updateUserDisplay() {
+      if (state.userProgress) {
+        elements.starsCount.textContent = state.userProgress.totalStars || 0;
+      }
+    }
+
+    // =============================================
+    // Initialization
+    // =============================================
+    function initEventListeners() {
+      // Auth form submissions
+      document.getElementById('signup-form').addEventListener('submit', handleSignup);
+      document.getElementById('login-form').addEventListener('submit', handleLogin);
+
+      // Tab switching
+      elements.tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // Auth tab switching
+      document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+        });
+      });
+    }
+
+    async function loadUserData(user) {
+      try {
+        const [userDoc, progressDoc] = await Promise.all([
+          db.collection('users').doc(user.uid).get(),
+          db.collection('user_progress').doc(user.uid).get()
+        ]);
+
+        state.userData = userDoc.exists ? userDoc.data() : null;
+        state.userProgress = progressDoc.exists ? progressDoc.data() : null;
+
+        updateUserDisplay();
+        renderTasks();
+        renderSurveyQuestion(0);
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      }
+    }
+
+    // =============================================
+    // Auth State Listener
+    // =============================================
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // User is signed in
+        state.currentUser = user;
+        elements.authModal.style.display = 'none';
+        elements.appContent.style.display = 'block';
+        await loadUserData(user);
+      } else {
+        // User is signed out
+        state.currentUser = null;
+        elements.authModal.style.display = 'flex';
+        elements.appContent.style.display = 'none';
+      }
+    });
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', () => {
+      initEventListeners();
+    });
+  </script>
+</body>
+</html>
