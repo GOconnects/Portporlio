@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engagement Portal</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --gray: #6b7280;
+      --gold: #fbbf24;
+      --dark: #1f2937;
+      --header-height: 25vh;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f9fafb;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    header {
+      height: var(--header-height);
+      min-height: 180px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+      flex-wrap: wrap;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stars-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      backdrop-filter: blur(5px);
+      font-size: 0.9rem;
+    }
+    
+    .stars-count {
+      font-weight: 700;
+    }
+    
+    .star-icon {
+      color: var(--gold);
+    }
+    
+    .counter-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      z-index: 2;
+    }
+    
+    .task-counter {
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 1.2rem;
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+    
+    main {
+      padding: 1rem;
+      position: relative;
+    }
+    
+    .nav-tabs {
+      display: flex;
+      border-bottom: 1px solid #e5e7eb;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0.5rem;
+    }
+    
+    .tab-btn {
+      padding: 0.8rem 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray);
+      position: relative;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    
+    .tab-btn.active {
+      color: var(--primary);
+    }
+    
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+    
+    .content-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .content-section.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .task-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .task-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1.2rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .task-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    }
+    
+    .task-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    
+    .task-number {
+      width: 30px;
+      height: 30px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 0.8rem;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+    
+    .task-name {
+      font-size: 1rem;
+      font-weight: 600;
+      flex-grow: 1;
+    }
+    
+    .task-status {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 0.8rem;
+    }
+    
+    .status-pending {
+      background: #f3f4f6;
+      color: var(--gray);
+    }
+    
+    .status-verified {
+      background: #dcfce7;
+      color: var(--success);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn {
+      flex: 1;
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+    }
+    
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: var(--secondary);
+    }
+    
+    .btn-secondary:hover {
+      background: #7c3aed;
+      transform: translateY(-2px);
+    }
+    
+    .btn-disabled {
+      background: #e5e7eb !important;
+      color: #9ca3af !important;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .btn-finish {
+      background: var(--gold);
+      color: #1f2937;
+      font-weight: 600;
+      padding: 0.8rem 1.5rem;
+      margin: 1.5rem auto;
+      display: block;
+      width: fit-content;
+      font-size: 1rem;
+    }
+    
+    .btn-finish:hover {
+      background: #f59e0b;
+      transform: scale(1.05);
+    }
+    
+    .verified-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: var(--success);
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .time-tracker {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 0.5rem;
+    }
+    
+    .progress-container {
+      margin: 1rem 0;
+    }
+    
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .verification-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      color: white;
+      font-size: 1rem;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .verification-content {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 400px;
+      color: var(--dark);
+    }
+    
+    .verification-result {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin: 1rem 0;
+    }
+    
+    .verification-success {
+      color: var(--success);
+    }
+    
+    .verification-failed {
+      color: var(--danger);
+    }
+    
+    .reset-notice {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+    
+    .reward-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      color: white;
+    }
+    
+    .reward-content {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      width: 90%;
+      max-width: 400px;
+      color: var(--dark);
+      text-align: center;
+    }
+    
+    .reward-star {
+      font-size: 3rem;
+      color: var(--gold);
+      margin: 1rem 0;
+      animation: pulse 1s infinite alternate;
+    }
+    
+    @keyframes pulse {
+      to { transform: scale(1.1); }
+    }
+    
+    .cooldown-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .cooldown-overlay h2 {
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+    
+    .cooldown-overlay p {
+      color: var(--gray);
+      max-width: 500px;
+      margin-bottom: 1.5rem;
+    }
+    
+    .cooldown-timer {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 1rem 0;
+    }
+    
+    .preface-content {
+      padding: 1rem;
+    }
+    
+    .preface-video {
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      aspect-ratio: 16/9;
+      background: #e5e7eb;
+      margin: 1rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      border-radius: 8px;
+    }
+    
+    .preface-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .preface-section h3 {
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .set-selector {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.5rem 0;
+      margin-bottom: 1rem;
+    }
+    
+    .set-btn {
+      padding: 0.5rem 1rem;
+      background: #e5e7eb;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--gray);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    
+    .set-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .set-btn.completed {
+      background: var(--success);
+      color: white;
+    }
+    
+    .set-btn.cooldown {
+      background: var(--gold);
+      color: var(--dark);
+    }
+    
+    .header-decoration {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+    }
+    
+    .decoration-1 {
+      top: -100px;
+      right: -70px;
+    }
+    
+    .decoration-2 {
+      bottom: -30px;
+      left: -30px;
+      width: 150px;
+      height: 150px;
+    }
+    
+    /* Survey Section Styles */
+    .survey-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 1rem;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .survey-question {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+
+    .survey-options {
+      margin-bottom: 1.5rem;
+    }
+
+    .survey-option {
+      display: block;
+      margin-bottom: 0.8rem;
+      padding: 0.8rem;
+      background: #f3f4f6;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .survey-option:hover {
+      background: #e5e7eb;
+    }
+
+    .survey-option input {
+      margin-right: 0.8rem;
+    }
+
+    .survey-ad {
+      background: #f0fdf4;
+      border: 1px solid #dcfce7;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      text-align: center;
+      color: var(--dark);
+    }
+
+    .survey-ad h3 {
+      color: var(--success);
+      margin-bottom: 0.5rem;
+    }
+
+    .survey-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+    }
+
+    .survey-progress {
+      text-align: center;
+      margin: 1rem 0;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .survey-finish {
+      background: var(--gold);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 1rem auto;
+      display: block;
+      transition: all 0.2s;
+    }
+
+    .survey-finish:hover {
+      background: #f59e0b;
+      transform: scale(1.05);
+    }
+
+    .survey-finish:disabled {
+      background: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Survey Cooldown */
+    .survey-cooldown {
+      text-align: center;
+      margin: 2rem 0;
+      color: var(--gray);
+    }
+
+    .survey-cooldown-timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 0.5rem 0;
+    }
+
+    /* KYC Section Styles */
+    .kyc-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .profile-image {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary);
+    }
+
+    .profile-info h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.5rem;
+      color: var(--dark);
+    }
+
+    .profile-info p {
+      margin: 0.3rem 0;
+      color: var(--gray);
+    }
+
+    .payment-info {
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .payment-info h4 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    .profile-upload-container {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .upload-area {
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .image-preview {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      border: 2px dashed #d1d5db;
+      transition: all 0.3s ease;
+    }
+
+    .image-preview:hover {
+      border-color: var(--primary);
+    }
+
+    #preview-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 2rem;
+      color: var(--gray);
+      margin-bottom: 0.5rem;
+    }
+
+    .upload-text {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .payment-section {
+      margin-bottom: 2rem;
+    }
+
+    .payment-section h3 {
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .payment-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .payment-option {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 1rem;
+      transition: all 0.2s;
+    }
+
+    .payment-option:hover {
+      border-color: var(--primary);
+    }
+
+    .payment-option input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+
+    .payment-details {
+      margin-top: 0.8rem;
+      display: none;
+    }
+
+    .payment-details input,
+    .payment-details select {
+      width: 100%;
+      padding: 0.6rem;
+      margin-bottom: 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+    }
+
+    .payment-option input[type="radio"]:checked ~ .payment-details {
+      display: block;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 0.8rem;
+        min-height: 160px;
+      }
+      
+      .logo {
+        font-size: 1.3rem;
+      }
+      
+      .stars-container {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      
+      .task-counter {
+        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+      }
+      
+      .task-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .survey-option {
+        padding: 0.6rem;
+      }
+
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .payment-methods {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Modern Header (25% height) -->
+  <header>
+    <div class="header-decoration decoration-1"></div>
+    <div class="header-decoration decoration-2"></div>
+    
+    <div class="header-content">
+      <div class="logo">EngagementPortal</div>
+      <div class="stars-container">
+        <span class="stars-count" id="stars-count">0</span>
+        <span class="star-icon">★</span>
+      </div>
+    </div>
+    
+    <div class="counter-container">
+      <div class="task-counter">
+        Total Tasks Completed: <span id="total-tasks-count">0</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" data-tab="preface">Preface</button>
+      <button class="tab-btn" data-tab="tasks">Tasks</button>
+      <button class="tab-btn" data-tab="surveys">Surveys</button>
+      <button class="tab-btn" data-tab="kyc">KYC</button>
+    </div>
+
+    <!-- Cooldown Overlay -->
+    <div class="cooldown-overlay" id="cooldown-overlay">
+      <h2>Task Set Completed!</h2>
+      <p>You've successfully completed all 10 tasks and earned your star reward.</p>
+      <p>New tasks will be available in:</p>
+      <div class="cooldown-timer" id="cooldown-timer">30:00</div>
+      <button class="btn" id="close-cooldown" style="background: var(--primary); color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 8px; cursor: pointer;">
+        Continue to Next Set
+      </button>
+    </div>
+
+    <!-- Preface Section -->
+    <section class="content-section active" id="preface-section">
+      <div class="preface-content">
+        <h2>Welcome to Our Engagement Portal</h2>
+        <div class="preface-video">
+          [Video Tutorial Placeholder]
+        </div>
+        
+        <div class="preface-section">
+          <h3>Our Vision</h3>
+          <p>To create meaningful engagement opportunities that benefit both our clients and our community through structured task completion and feedback systems.</p>
+        </div>
+        
+        <div class="preface-section">
+          <h3>Objectives</h3>
+          <ul>
+            <li>Provide clear, achievable tasks with fair rewards</li>
+            <li>Collect valuable feedback to improve our services</li>
+            <li>Create a mutually beneficial ecosystem for all participants</li>
+          </ul>
+        </div>
+        
+        <div class="preface-section">
+          <h3>Policies</h3>
+          <ul>
+            <li>Each task requires genuine engagement (minimum 30 seconds)</li>
+            <li>Complete all 10 tasks to earn your star reward</li>
+            <li>After completing a set, new tasks will be available after a 30-minute cooldown</li>
+            <li>10 different sets available to complete</li>
+            <li>Surveys reward 1 star after 20 questions (5-minute cooldown)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tasks Section -->
+    <section class="content-section" id="tasks-section">
+      <div class="set-selector" id="set-selector">
+        <!-- Set buttons will be inserted here -->
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-text">
+          <span>Current Set Progress</span>
+          <span id="progress-count">0/10 completed</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress" id="progress-bar"></div>
+        </div>
+      </div>
+      
+      <p style="margin-bottom: 1.5rem; color: var(--gray);">Complete and verify all tasks to earn your star reward</p>
+      
+      <div class="task-container" id="tasks-container">
+        <!-- Task cards will be inserted here -->
+      </div>
+      
+      <button class="btn btn-finish" id="finish-btn">Finish All Tasks</button>
+    </section>
+
+    <!-- Surveys Section -->
+    <section class="content-section" id="surveys-section">
+      <h2 style="margin-bottom: 1.5rem;">Customer Satisfaction Survey</h2>
+      
+      <div class="survey-container" id="survey-container">
+        <!-- Survey content will be inserted here -->
+      </div>
+      
+      <div class="survey-cooldown" id="survey-cooldown" style="display: none;">
+        <h3>Survey Completed!</h3>
+        <p>Thank you for completing our survey. You've earned 1 star!</p>
+        <p>You can take this survey again in:</p>
+        <div class="survey-cooldown-timer" id="survey-cooldown-timer">05:00</div>
+      </div>
+      
+      <button class="btn btn-finish" id="finish-survey-btn" style="display: none; margin: 1.5rem auto;">
+        Finish Survey and Claim Reward
+      </button>
+    </section>
+
+    <!-- KYC Section -->
+    <section class="content-section" id="kyc-section">
+      <div class="kyc-container">
+        <h2>KYC Verification</h2>
+        
+        <!-- Display saved KYC info -->
+        <div class="kyc-display" id="kyc-display" style="display: none;">
+          <div class="profile-header">
+            <img id="display-profile-pic" class="profile-image">
+            <div class="profile-info">
+              <h3 id="display-name"></h3>
+              <p id="display-email"></p>
+              <p id="display-nationality"></p>
+              <p id="display-portal-code"></p>
+            </div>
+          </div>
+          
+          <div class="payment-info">
+            <h4>Payment Method:</h4>
+            <p id="display-payment-method"></p>
+            <p id="display-payment-details"></p>
+          </div>
+          
+          <button class="btn btn-secondary" id="edit-kyc">Edit Profile</button>
+        </div>
+        
+        <!-- KYC Form (initially hidden if data exists) -->
+        <form id="kyc-form" style="display: none;">
+          <div class="profile-upload-container">
+            <div class="upload-area" id="upload-area">
+              <input type="file" id="profile-pic" accept="image/*" style="display: none;">
+              <div class="upload-content">
+                <div class="image-preview" id="image-preview">
+                  <img id="preview-image">
+                  <span class="upload-icon">+</span>
+                  <span class="upload-text">Upload Profile Photo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="full-name">Full Name</label>
+              <input type="text" id="full-name" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="nationality">Nationality</label>
+              <input type="text" id="nationality" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="portal-code">Portal Code</label>
+              <input type="text" id="portal-code" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" required>
+            </div>
+          </div>
+          
+          <div class="payment-section">
+            <h3>Payment Information</h3>
+            <div class="payment-methods">
+              <div class="payment-option">
+                <input type="radio" name="payment" id="paypal" value="paypal">
+                <label for="paypal">PayPal</label>
+                <div class="payment-details" id="paypal-details">
+                  <input type="email" placeholder="PayPal Email Address">
+                </div>
+              </div>
+              
+              <div class="payment-option">
+                <input type="radio" name="payment" id="geegpay" value="geegpay">
+                <label for="geegpay">Geegpay</label>
+                <div class="payment-details" id="geegpay-details">
+                  <input type="text" placeholder="Geegpay Account Number">
+                </div>
+              </div>
+              
+              <div class="payment-option">
+                <input type="radio" name="payment" id="kuda" value="kuda">
+                <label for="kuda">Kuda</label>
+                <div class="payment-details" id="kuda-details">
+                  <input type="text" placeholder="Kuda Account Number">
+                </div>
+              </div>
+              
+              <div class="payment-option">
+                <input type="radio" name="payment" id="bybit" value="bybit">
+                <label for="bybit">Bybit (USDT)</label>
+                <div class="payment-details" id="bybit-details">
+                  <input type="text" placeholder="USDT Wallet Address">
+                  <select>
+                    <option value="erc20">ERC-20</option>
+                    <option value="trc20">TRC-20</option>
+                    <option value="bep20">BEP-20</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="payment-option">
+                <input type="radio" name="payment" id="getio" value="getio">
+                <label for="getio">Getio (USDT)</label>
+                <div class="payment-details" id="getio-details">
+                  <input type="text" placeholder="USDT Wallet Address">
+                  <select>
+                    <option value="erc20">ERC-20</option>
+                    <option value="trc20">TRC-20</option>
+                    <option value="bep20">BEP-20</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Details</button>
+            <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Verification Modal -->
+    <div class="verification-modal" id="verification-modal">
+      <div class="verification-content">
+        <h3>Verification Result</h3>
+        <div class="verification-result" id="verification-result"></div>
+        <p id="verification-message"></p>
+        <div id="reset-notice" class="reset-notice" style="display: none;">
+          This task has been reset. Please start it again.
+        </div>
+        <button id="close-verification-modal" class="btn btn-primary" style="margin-top: 1.5rem; padding: 0.8rem 2rem;">
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <!-- Reward Modal -->
+    <div class="reward-modal" id="reward-modal">
+      <div class="reward-content">
+        <div class="reward-star">★</div>
+        <h3>Congratulations!</h3>
+        <p>You've successfully completed all 10 tasks!</p>
+        <p>Your star reward has been added</p>
+        <button class="btn" id="close-reward-modal" style="background: var(--gold); color: #1f2937; font-weight: 600; margin-top: 1.5rem; padding: 0.8rem 2rem;">
+          Awesome!
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Task configuration (10 sets of 10 tasks each)
+    const taskSets = [
+      {
+        id: 1,
+        name: "Set 1: Brand Awareness",
+        tasks: [
+          { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage01.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage02.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage03.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage04.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage05.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage06.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage07.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage08.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/page09.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage010.html" }
+        ]
+      },
+      {
+        id: 2,
+        name: "Set 2: Product Knowledge",
+        tasks: [
+  { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage1.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage10.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage2.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage3.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage4.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage5.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage6.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage7.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage8.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage9.html" }
+        ]
+      },
+      {
+        id: 3,
+        name: "Set 3: Customer Engagement",
+        tasks: [
+  { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage11.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage12.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage13.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage14.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage15.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage16.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage17.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage18.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage19.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage20.html" }
+        ]
+      },
+      {
+        id: 4,
+        name: "Set 4: Market Research",
+        tasks: [
+  { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage21.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage22.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage23.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage24.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage25.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage26.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage27.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage28.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage29.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage30.html" }
+        ]
+      },
+      {
+        id: 5,
+        name: "Set 5: Sales Training",
+        tasks: [
+        { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage06.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage7.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage2.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage20.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage21.html" }
+        ]
+      },
+      {
+        id: 6,
+        name: "Set 6: Technical Skills",
+        tasks: [
+          { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage01.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage02.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage03.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage04.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage05.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage06.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage07.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage08.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage09.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage010.html" }
+        ]
+      },
+      {
+        id: 7,
+        name: "Set 7: Leadership",
+        tasks: [
+          { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage1.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage2.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage3.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage4.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage5.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage6.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage7.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage8.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage09.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage10.html" }
+        ]
+      },
+      {
+        id: 8,
+        name: "Set 8: Innovation",
+        tasks: [
+  { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage11.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage12.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage13.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage14.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage15.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage16.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage17.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage18.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage19.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage20.html" }
+        ]
+      },
+      {
+        id: 9,
+        name: "Set 9: Compliance",
+        tasks: [
+  { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage21.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage22.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage23.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage24.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage25.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage26.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage27.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage28.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage29.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage30.html" }
+        ]
+      },
+      {
+        id: 10,
+        name: "Set 10: Wellness",
+        tasks: [
+          { id: 1, name: "Brand Overview", url: "https://goconnects.cloud/tpage01.html" },
+          { id: 2, name: "Product Demo", url: "https://goconnects.cloud/tpage02.html" },
+          { id: 3, name: "Market Analysis", url: "https://goconnects.cloud/tpage03.html" },
+          { id: 4, name: "Service Walkthrough", url: "https://goconnects.cloud/tpage04.html" },
+          { id: 5, name: "Customer Stories", url: "https://goconnects.cloud/tpage05.html" },
+          { id: 6, name: "Technical Specs", url: "https://goconnects.cloud/tpage06.html" },
+          { id: 7, name: "Pricing Options", url: "https://goconnects.cloud/tpage07.html" },
+          { id: 8, name: "Case Studies", url: "https://goconnects.cloud/tpage08.html" },
+          { id: 9, name: "Implementation Guide", url: "https://goconnects.cloud/tpage09.html" },
+          { id: 10, name: "Final Notes", url: "https://goconnects.cloud/tpage010.html" }
+        ]
+      }
+    ];
+
+    // Survey configuration
+    const survey = {
+      questions: [
+        {
+          id: 1,
+          text: "How satisfied are you with our product quality?",
+          options: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"],
+          ad: "Try our premium line for even higher quality!"
+        },
+        {
+          id: 2,
+          text: "How easy was it to use our website?",
+          options: ["Very Easy", "Easy", "Neutral", "Difficult", "Very Difficult"],
+          ad: "Check out our tutorial videos for helpful tips!"
+        },
+        {
+          id: 3,
+          text: "How likely are you to recommend us to others?",
+          options: ["Very Likely", "Likely", "Neutral", "Unlikely", "Very Unlikely"],
+          ad: "Refer a friend and get 10% off your next purchase!"
+        },
+        {
+          id: 4,
+          text: "How would you rate our customer service?",
+          options: ["Excellent", "Good", "Average", "Poor", "Very Poor"],
+          ad: "Our support team is available 24/7 to assist you!"
+        },
+        {
+          id: 5,
+          text: "How often do you use our product/service?",
+          options: ["Daily", "Weekly", "Monthly", "Rarely", "First Time"],
+          ad: "Subscribe and save with our monthly plans!"
+        },
+        {
+          id: 6,
+          text: "How responsive have we been to your inquiries?",
+          options: ["Very Responsive", "Responsive", "Neutral", "Slow", "Very Slow"],
+          ad: "Try our live chat for instant support!"
+        },
+        {
+          id: 7,
+          text: "How would you rate our pricing?",
+          options: ["Excellent Value", "Good Value", "Fair", "Expensive", "Very Expensive"],
+          ad: "Limited time offer: 20% off for new customers!"
+        },
+        {
+          id: 8,
+          text: "How innovative do you find our products?",
+          options: ["Very Innovative", "Innovative", "Average", "Not Innovative", "Outdated"],
+          ad: "Coming soon: Our revolutionary new product line!"
+        },
+        {
+          id: 9,
+          text: "How reliable is our service?",
+          options: ["Very Reliable", "Reliable", "Average", "Unreliable", "Very Unreliable"],
+          ad: "Our 99.9% uptime guarantee ensures you're always connected!"
+        },
+        {
+          id: 10,
+          text: "How well do our products meet your needs?",
+          options: ["Perfectly", "Well", "Moderately", "Poorly", "Not at All"],
+          ad: "Custom solutions available for your specific requirements!"
+        },
+        {
+          id: 11,
+          text: "How would you rate our delivery speed?",
+          options: ["Very Fast", "Fast", "Average", "Slow", "Very Slow"],
+          ad: "Upgrade to express shipping for faster delivery!"
+        },
+        {
+          id: 12,
+          text: "How user-friendly is our interface?",
+          options: ["Very User-Friendly", "User-Friendly", "Neutral", "Complex", "Very Complex"],
+          ad: "New simplified interface launching next month!"
+        },
+        {
+          id: 13,
+          text: "How knowledgeable is our support team?",
+          options: ["Very Knowledgeable", "Knowledgeable", "Average", "Limited Knowledge", "Not Knowledgeable"],
+          ad: "Our certified experts are ready to help you!"
+        },
+        {
+          id: 14,
+          text: "How would you rate our product variety?",
+          options: ["Excellent", "Good", "Average", "Limited", "Very Limited"],
+          ad: "New products added weekly - check back often!"
+        },
+        {
+          id: 15,
+          text: "How secure do you feel using our service?",
+          options: ["Very Secure", "Secure", "Neutral", "Insecure", "Very Insecure"],
+          ad: "Learn about our advanced security features!"
+        },
+        {
+          id: 16,
+          text: "How would you rate our return policy?",
+          options: ["Excellent", "Good", "Fair", "Poor", "Very Poor"],
+          ad: "Hassle-free returns within 30 days!"
+        },
+        {
+          id: 17,
+          text: "How often do you encounter issues?",
+          options: ["Never", "Rarely", "Sometimes", "Often", "Very Often"],
+          ad: "Our improved version has 50% fewer reported issues!"
+        },
+        {
+          id: 18,
+          text: "How would you rate our mobile experience?",
+          options: ["Excellent", "Good", "Average", "Poor", "Very Poor"],
+          ad: "Download our app for an even better mobile experience!"
+        },
+        {
+          id: 19,
+          text: "How well do we communicate updates?",
+          options: ["Very Well", "Well", "Average", "Poorly", "Very Poorly"],
+          ad: "Subscribe to our newsletter for regular updates!"
+        },
+        {
+          id: 20,
+          text: "Overall, how satisfied are you with our company?",
+          options: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"],
+          ad: "Thank you for your feedback! We're constantly improving."
+        }
+      ],
+      cooldownDuration: 5 * 60 * 1000, // 5 minutes in milliseconds
+      currentQuestion: 0,
+      answers: [],
+      cooldownEnd: parseInt(localStorage.getItem('surveyCooldownEnd')) || null,
+      completions: JSON.parse(localStorage.getItem('surveyCompletions')) || []
+    };
+
+    // Tracking system
+    const appData = {
+      stars: parseInt(localStorage.getItem('stars')) || 0,
+      totalTasksCompleted: parseInt(localStorage.getItem('totalTasksCompleted')) || 0,
+      currentTab: 'preface',
+      currentSet: parseInt(localStorage.getItem('currentSet')) || 1,
+      setData: JSON.parse(localStorage.getItem('setData')) || initializeSetData(),
+      cooldownTimers: JSON.parse(localStorage.getItem('cooldownTimers')) || {},
+      taskCompletions: JSON.parse(localStorage.getItem('taskCompletions')) || []
+    };
+
+    function initializeSetData() {
+      const data = {};
+      taskSets.forEach(set => {
+        data[set.id] = {
+          verifiedTasks: Array(10).fill(false),
+          startTimes: Array(10).fill(null),
+          rewardGiven: false,
+          completed: false,
+          completions: []
+        };
+      });
+      return data;
+    }
+
+    // DOM Elements
+    const starsCountEl = document.getElementById('stars-count');
+    const totalTasksCountEl = document.getElementById('total-tasks-count');
+    const tasksContainer = document.getElementById('tasks-container');
+    const setSelectorEl = document.getElementById('set-selector');
+    const progressBar = document.getElementById('progress-bar');
+    const progressCount = document.getElementById('progress-count');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const contentSections = document.querySelectorAll('.content-section');
+    const cooldownOverlay = document.getElementById('cooldown-overlay');
+    const cooldownTimerEl = document.getElementById('cooldown-timer');
+    const closeCooldownBtn = document.getElementById('close-cooldown');
+    const verificationModal = document.getElementById('verification-modal');
+    const verificationResultEl = document.getElementById('verification-result');
+    const verificationMessageEl = document.getElementById('verification-message');
+    const resetNotice = document.getElementById('reset-notice');
+    const closeVerificationModalBtn = document.getElementById('close-verification-modal');
+    const finishBtn = document.getElementById('finish-btn');
+    const rewardModal = document.getElementById('reward-modal');
+    const closeRewardModalBtn = document.getElementById('close-reward-modal');
+    const surveyContainer = document.getElementById('survey-container');
+    const surveyCooldown = document.getElementById('survey-cooldown');
+    const surveyCooldownTimer = document.getElementById('survey-cooldown-timer');
+    const finishSurveyBtn = document.getElementById('finish-survey-btn');
+
+    // KYC functionality
+    function initKYC() {
+      const kycForm = document.getElementById('kyc-form');
+      const kycDisplay = document.getElementById('kyc-display');
+      const uploadArea = document.getElementById('upload-area');
+      const profilePicInput = document.getElementById('profile-pic');
+      const previewImage = document.getElementById('preview-image');
+      const imagePreview = document.getElementById('image-preview');
+      const editBtn = document.getElementById('edit-kyc');
+      const cancelEditBtn = document.getElementById('cancel-edit');
+      
+      // Load saved KYC data
+      const kycData = JSON.parse(localStorage.getItem('kycData')) || null;
+      
+      if (kycData) {
+        showKYCData(kycData);
+        kycDisplay.style.display = 'block';
+        kycForm.style.display = 'none';
+      } else {
+        kycDisplay.style.display = 'none';
+        kycForm.style.display = 'block';
+      }
+      
+      // Handle image upload
+      uploadArea.addEventListener('click', () => profilePicInput.click());
+      
+      profilePicInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            previewImage.src = event.target.result;
+            previewImage.style.display = 'block';
+            imagePreview.querySelector('.upload-icon').style.display = 'none';
+            imagePreview.querySelector('.upload-text').style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      // Handle payment method selection
+      document.querySelectorAll('input[name="payment"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          // Hide all payment details first
+          document.querySelectorAll('.payment-details').forEach(el => {
+            el.style.display = 'none';
+          });
+          
+          // Show selected payment details
+          const detailsId = this.id + '-details';
+          document.getElementById(detailsId).style.display = 'block';
+        });
+      });
+      
+      // Save KYC data
+      kycForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        const paymentDetails = {};
+        
+        // Get payment details based on selected method
+        if (paymentMethod === 'paypal') {
+          paymentDetails.account = document.querySelector('#paypal-details input').value;
+        } else if (paymentMethod === 'geegpay') {
+          paymentDetails.account = document.querySelector('#geegpay-details input').value;
+        } else if (paymentMethod === 'kuda') {
+          paymentDetails.account = document.querySelector('#kuda-details input').value;
+        } else if (paymentMethod === 'bybit' || paymentMethod === 'getio') {
+          paymentDetails.address = document.querySelector(`#${paymentMethod}-details input`).value;
+          paymentDetails.network = document.querySelector(`#${paymentMethod}-details select`).value;
+        }
+        
+        const formData = {
+          fullName: document.getElementById('full-name').value,
+          nationality: document.getElementById('nationality').value,
+          portalCode: document.getElementById('portal-code').value,
+          email: document.getElementById('email').value,
+          profilePic: previewImage.src.includes('data:image') ? previewImage.src : null,
+          paymentMethod: paymentMethod,
+          paymentDetails: paymentDetails,
+          updatedAt: new Date().toISOString()
+        };
+        
+        localStorage.setItem('kycData', JSON.stringify(formData));
+        showKYCData(formData);
+        
+        kycDisplay.style.display = 'block';
+        kycForm.style.display = 'none';
+      });
+      
+      // Edit KYC data
+      editBtn.addEventListener('click', () => {
+        kycDisplay.style.display = 'none';
+        kycForm.style.display = 'block';
+        
+        // Populate form with existing data
+        if (kycData) {
+          document.getElementById('full-name').value = kycData.fullName || '';
+          document.getElementById('nationality').value = kycData.nationality || '';
+          document.getElementById('portal-code').value = kycData.portalCode || '';
+          document.getElementById('email').value = kycData.email || '';
+          
+          if (kycData.profilePic) {
+            previewImage.src = kycData.profilePic;
+            previewImage.style.display = 'block';
+            imagePreview.querySelector('.upload-icon').style.display = 'none';
+            imagePreview.querySelector('.upload-text').style.display = 'none';
+          }
+          
+          if (kycData.paymentMethod) {
+            document.querySelector(`input[name="payment"][value="${kycData.paymentMethod}"]`).checked = true;
+            const detailsId = kycData.paymentMethod + '-details';
+            document.getElementById(detailsId).style.display = 'block';
+            
+            if (kycData.paymentMethod === 'paypal') {
+              document.querySelector('#paypal-details input').value = kycData.paymentDetails.account || '';
+            } else if (kycData.paymentMethod === 'geegpay') {
+              document.querySelector('#geegpay-details input').value = kycData.paymentDetails.account || '';
+            } else if (kycData.paymentMethod === 'kuda') {
+              document.querySelector('#kuda-details input').value = kycData.paymentDetails.account || '';
+            } else if (kycData.paymentMethod === 'bybit' || kycData.paymentMethod === 'getio') {
+              document.querySelector(`#${kycData.paymentMethod}-details input`).value = kycData.paymentDetails.address || '';
+              document.querySelector(`#${kycData.paymentMethod}-details select`).value = kycData.paymentDetails.network || 'erc20';
+            }
+          }
+        }
+      });
+      
+      // Cancel edit
+      cancelEditBtn.addEventListener('click', () => {
+        kycDisplay.style.display = 'block';
+        kycForm.style.display = 'none';
+      });
+      
+      // Helper function to display KYC data
+      function showKYCData(data) {
+        document.getElementById('display-name').textContent = data.fullName;
+        document.getElementById('display-email').textContent = data.email;
+        document.getElementById('display-nationality').textContent = `Nationality: ${data.nationality}`;
+        document.getElementById('display-portal-code').textContent = `Portal Code: ${data.portalCode}`;
+        
+        const displayPic = document.getElementById('display-profile-pic');
+        if (data.profilePic) {
+          displayPic.src = data.profilePic;
+        } else {
+          displayPic.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2QxZDFkMSIgZD0iTTEyIDJDNi40NzcgMiAyIDYuNDc3IDIgMTJzNC40NzcgMTAgMTAgMTAgMTAtNC40NzcgMTAtMTBTMTcuNTIzIDIgMTIgMnptMCAxOGMtNC40MTggMC04LTMuNTgyLTgtOHMzLjU4Mi04IDgtOCA4IDMuNTgyIDggOC0zLjU4MiA4LTggOHptLTUtMTNhMiAyIDAgMTE0IDAgMiAyIDAgMDEtNCAwem03Ljk0NCAxMi4wMjVhOS4wMTkgOS4wMTkgMCAwMS05Ljg4OCAwIDcuNSA3LjUgMCAwMTkuODg4LTF6Ii8+PC9zdmc+';
+        }
+        
+        // Display payment info
+        document.getElementById('display-payment-method').textContent = formatPaymentMethod(data.paymentMethod);
+        document.getElementById('display-payment-details').textContent = formatPaymentDetails(data.paymentMethod, data.paymentDetails);
+      }
+      
+      function formatPaymentMethod(method) {
+        const methods = {
+          paypal: 'PayPal',
+          geegpay: 'Geegpay',
+          kuda: 'Kuda',
+          bybit: 'Bybit (USDT)',
+          getio: 'Getio (USDT)'
+        };
+        return methods[method] || method;
+      }
+      
+      function formatPaymentDetails(method, details) {
+        if (!details) return '';
+        
+        if (method === 'paypal' || method === 'geegpay' || method === 'kuda') {
+          return `Account: ${details.account}`;
+        } else if (method === 'bybit' || method === 'getio') {
+          return `Address: ${details.address} (${details.network.toUpperCase()})`;
+        }
+        return '';
+      }
+    }
+
+    // Initialize
+    function init() {
+      updateStars();
+      updateTotalTasksCount();
+      checkAllCooldowns();
+      renderSetSelector();
+      renderTasks(appData.currentSet);
+      setupEventListeners();
+      checkReturningUser();
+      initSurvey();
+      initKYC();
+    }
+
+    // Update stars display
+    function updateStars() {
+      starsCountEl.textContent = appData.stars;
+      localStorage.setItem('stars', appData.stars);
+    }
+
+    // Update total tasks counter
+    function updateTotalTasksCount() {
+      totalTasksCountEl.textContent = appData.totalTasksCompleted;
+      localStorage.setItem('totalTasksCompleted', appData.totalTasksCompleted);
+    }
+
+    // Check all cooldown timers
+    function checkAllCooldowns() {
+      const now = Date.now();
+      let activeCooldown = false;
+      
+      for (const setId in appData.cooldownTimers) {
+        const endTime = appData.cooldownTimers[setId];
+        
+        if (now < endTime) {
+          // Still in cooldown
+          startCooldownTimer(setId, endTime - now);
+          if (parseInt(setId) === appData.currentSet) {
+            activeCooldown = true;
+            cooldownOverlay.style.display = 'flex';
+          }
+        } else {
+          // Cooldown finished - reset the set
+          resetSetAfterCooldown(setId);
+          delete appData.cooldownTimers[setId];
+        }
+      }
+      
+      // Handle survey cooldown
+      if (survey.cooldownEnd && now < survey.cooldownEnd) {
+        showSurveyCooldown();
+        startSurveyCooldown(survey.cooldownEnd - now);
+      } else if (survey.cooldownEnd) {
+        // Survey cooldown finished
+        resetSurveyAfterCooldown();
+        survey.cooldownEnd = null;
+        localStorage.removeItem('surveyCooldownEnd');
+      }
+      
+      localStorage.setItem('cooldownTimers', JSON.stringify(appData.cooldownTimers));
+      return activeCooldown;
+    }
+
+    // Reset task set after cooldown
+    function resetSetAfterCooldown(setId) {
+      const setData = appData.setData[setId];
+      
+      // Create new completion record
+      if (setData.completed) {
+        const completionId = Date.now();
+        const completionData = {
+          setId: setId,
+          completionId: completionId,
+          completedAt: setData.completedAt || new Date().toISOString(),
+          rewardGiven: setData.rewardGiven
+        };
+        
+        appData.taskCompletions.push(completionData);
+        localStorage.setItem('taskCompletions', JSON.stringify(appData.taskCompletions));
+      }
+      
+      // Reset set data
+      setData.verifiedTasks = Array(10).fill(false);
+      setData.startTimes = Array(10).fill(null);
+      setData.rewardGiven = false;
+      setData.completed = false;
+      if (setData.completedAt) delete setData.completedAt;
+      
+      localStorage.setItem('setData', JSON.stringify(appData.setData));
+    }
+
+    // Reset survey after cooldown
+    function resetSurveyAfterCooldown() {
+      // Create new completion record
+      if (survey.answers.length === survey.questions.length) {
+        const completionId = Date.now();
+        const completionData = {
+          completionId: completionId,
+          completedAt: new Date().toISOString(),
+          rewardGiven: true
+        };
+        
+        survey.completions.push(completionData);
+        localStorage.setItem('surveyCompletions', JSON.stringify(survey.completions));
+      }
+      
+      // Reset survey data
+      survey.answers = [];
+      survey.currentQuestion = 0;
+      localStorage.setItem('surveyCompleted', 'false');
+    }
+
+    // Start cooldown timer for a specific set
+    function startCooldownTimer(setId, remaining) {
+      clearInterval(cooldownIntervals[setId]);
+      
+      cooldownIntervals[setId] = setInterval(() => {
+        remaining -= 1000;
+        
+        if (remaining <= 0) {
+          clearInterval(cooldownIntervals[setId]);
+          delete appData.cooldownTimers[setId];
+          localStorage.setItem('cooldownTimers', JSON.stringify(appData.cooldownTimers));
+          
+          // Reset the set to fresh state
+          resetSetAfterCooldown(setId);
+          
+          if (parseInt(setId) === appData.currentSet) {
+            cooldownOverlay.style.display = 'none';
+            renderTasks(setId); // Show fresh tasks
+          }
+          
+          renderSetSelector(); // Update set selector UI
+          return;
+        }
+        
+        if (parseInt(setId) === appData.currentSet) {
+          updateCooldownDisplay(remaining);
+        }
+      }, 1000);
+      
+      if (parseInt(setId) === appData.currentSet) {
+        updateCooldownDisplay(remaining);
+      }
+    }
+
+    // Update cooldown display
+    function updateCooldownDisplay(ms) {
+      const minutes = Math.floor(ms / (1000 * 60));
+      const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+      cooldownTimerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Render set selector buttons
+    function renderSetSelector() {
+      setSelectorEl.innerHTML = taskSets.map(set => {
+        const setData = appData.setData[set.id];
+        const isCurrent = set.id === appData.currentSet;
+        const isCompleted = setData.completed;
+        const inCooldown = appData.cooldownTimers[set.id] !== undefined;
+        
+        let btnClass = '';
+        if (isCurrent) btnClass = 'active';
+        else if (isCompleted) btnClass = 'completed';
+        else if (inCooldown) btnClass = 'cooldown';
+        
+        return `
+          <button class="set-btn ${btnClass}" data-set="${set.id}">
+            ${set.name}
+            ${inCooldown ? '⏳' : isCompleted ? '✓' : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    // Render tasks for a specific set
+    function renderTasks(setId) {
+      const set = taskSets.find(s => s.id === setId);
+      const setData = appData.setData[setId];
+      
+      tasksContainer.innerHTML = set.tasks.map((task, index) => {
+        const isVerified = setData.verifiedTasks[index];
+        const isStarted = setData.startTimes[index] !== null;
+        
+        return `
+          <div class="task-card">
+            ${isVerified ? '<div class="verified-badge" title="Verified">✓</div>' : ''}
+            <div class="task-header">
+              <div class="task-number">${task.id}</div>
+              <div class="task-name">${task.name}</div>
+            </div>
+            <div class="task-status ${isVerified ? 'status-verified' : 'status-pending'}">
+              ${isVerified ? 'Verified' : 'Pending'}
+            </div>
+            <div class="btn-group">
+              <a href="${task.url}" class="btn btn-primary" data-index="${index}" data-type="start" target="_blank">
+                ${isStarted && !isVerified ? 'Continue Task' : 'Start Task'}
+              </a>
+              <button class="btn btn-secondary ${isStarted && !isVerified ? '' : 'btn-disabled'}" 
+                data-index="${index}" data-type="verify" ${isStarted && !isVerified ? '' : 'disabled'}>
+                Verify Task
+              </button>
+            </div>
+            ${setData.startTimes[index] ? `
+              <div class="time-tracker">
+                Task started at: ${new Date(setData.startTimes[index]).toLocaleTimeString()}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      updateProgress(setId);
+
+      // Attach click handlers to Start Task links
+      document.querySelectorAll('[data-type="start"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          const index = parseInt(this.getAttribute('data-index'));
+          startTask(setId, index);
+        });
+      });
+
+      // Attach click handlers to Verify buttons
+      document.querySelectorAll('[data-type="verify"]:not(.btn-disabled)').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          verifyTask(setId, index);
+        });
+      });
+    }
+
+    // Update progress bar and count for a set
+    function updateProgress(setId) {
+      const setData = appData.setData[setId];
+      const verifiedCount = setData.verifiedTasks.filter(Boolean).length;
+      const progress = (verifiedCount / 10) * 100;
+      progressBar.style.width = `${progress}%`;
+      progressCount.textContent = `${verifiedCount}/10 completed`;
+      
+      // Enable/disable finish button
+      finishBtn.disabled = verifiedCount !== 10;
+    }
+
+    // Start task
+    function startTask(setId, index) {
+      const setData = appData.setData[setId];
+      
+      if (!setData.startTimes[index]) {
+        setData.startTimes[index] = Date.now();
+        localStorage.setItem('setData', JSON.stringify(appData.setData));
+      }
+      
+      localStorage.setItem('currentTask', JSON.stringify({
+        setId: setId,
+        taskIndex: index
+      }));
+    }
+
+function verifyTask(setId, index) {
+  const setData = appData.setData[setId];
+  const startTime = setData.startTimes[index];
+  const currentTime = Date.now();
+  const timeSpent = (currentTime - startTime) / 1000;
+  
+  verificationModal.style.display = 'flex';
+  resetNotice.style.display = 'none';
+  
+  if (timeSpent >= 30) {
+    setData.verifiedTasks[index] = true;
+    appData.totalTasksCompleted++;
+    localStorage.setItem('setData', JSON.stringify(appData.setData));
+    localStorage.setItem('totalTasksCompleted', appData.totalTasksCompleted);
+    verificationResultEl.textContent = "✓ Verification Successful";
+    verificationResultEl.className = "verification-result verification-success";
+    verificationMessageEl.textContent = `You spent ${Math.floor(timeSpent)} seconds on this task`;
+    updateProgress(setId);
+    updateTotalTasksCount();
+  } else {
+    verificationResultEl.textContent = "✗ Verification Failed";
+    verificationResultEl.className = "verification-result verification-failed";
+    verificationMessageEl.textContent = `You only spent ${Math.floor(timeSpent)} seconds (minimum 30 required)`;
+    resetNotice.style.display = 'block';
+    resetTask(setId, index);
+  }
+}
+
+function resetTask(setId, index) {
+  const setData = appData.setData[setId];
+  setData.startTimes[index] = null;
+  setData.verifiedTasks[index] = false;
+  localStorage.setItem('setData', JSON.stringify(appData.setData));
+}
+
+function checkReturningUser() {
+  const completedTask = JSON.parse(localStorage.getItem('currentTask'));
+  if (completedTask) {
+    const { setId, taskIndex } = completedTask;
+    const setData = appData.setData[setId];
+    
+    if (!setData.verifiedTasks[taskIndex]) {
+      if (!setData.startTimes[taskIndex]) {
+        setData.startTimes[taskIndex] = Date.now();
+        localStorage.setItem('setData', JSON.stringify(appData.setData));
+      }
+      
+      appData.currentSet = setId;
+      localStorage.setItem('currentSet', setId);
+      renderTasks(setId);
+      renderSetSelector();
+    }
+    
+    localStorage.removeItem('currentTask');
+  }
+}
+// Survey Functions
+function initSurvey() {
+  // Reset survey answers if cooldown is over
+  if (survey.cooldownEnd && Date.now() > survey.cooldownEnd) {
+    survey.cooldownEnd = null;
+    localStorage.removeItem('surveyCooldownEnd');
+    survey.answers = [];
+  }
+
+  // Show appropriate view based on survey state
+  if (survey.cooldownEnd && Date.now() < survey.cooldownEnd) {
+    showSurveyCooldown();
+    startSurveyCooldown(survey.cooldownEnd - Date.now());
+  } else if (survey.answers.length === survey.questions.length) {
+    // If all questions answered but not submitted
+    showSurveyQuestion(survey.currentQuestion);
+    finishSurveyBtn.style.display = 'block';
+  } else {
+    // Start or continue survey
+    showSurveyQuestion(survey.currentQuestion);
+    finishSurveyBtn.style.display = 'none';
+  }
+}
+
+function showSurveyQuestion(index) {
+  survey.currentQuestion = index;
+  const question = survey.questions[index];
+  
+  // Build survey HTML
+  let surveyHTML = `
+    <div class="survey-question">${question.text}</div>
+    <div class="survey-options" id="survey-options">
+  `;
+  
+  // Add options
+  question.options.forEach((option, i) => {
+    surveyHTML += `
+      <label class="survey-option">
+        <input type="radio" name="survey-answer" value="${i}" 
+          ${survey.answers[index] === i ? 'checked' : ''}>
+        ${option}
+      </label>
+    `;
+  });
+  
+  surveyHTML += `
+    </div>
+    <div class="survey-ad">
+      <h3>Special Offer</h3>
+      <p>${question.ad}</p>
+    </div>
+    <div class="survey-progress">
+      Question ${index + 1} of ${survey.questions.length}
+    </div>
+    <div class="survey-nav">
+      <button class="btn ${index === 0 ? 'btn-disabled' : 'btn-primary'}" 
+        id="survey-prev" ${index === 0 ? 'disabled' : ''}>
+        Previous
+      </button>
+      <button class="btn ${index === survey.questions.length - 1 ? 'btn-success' : 'btn-primary'}" 
+        id="survey-next" ${survey.answers[index] === undefined ? 'disabled' : ''}>
+        ${index === survey.questions.length - 1 ? 'Review Answers' : 'Next'}
+      </button>
+    </div>
+  `;
+  
+  // Update survey container
+  surveyContainer.innerHTML = surveyHTML;
+  surveyContainer.style.display = 'block';
+  surveyCooldown.style.display = 'none';
+  
+  // Set up event listeners for the new elements
+  setupSurveyQuestionEvents(index);
+}
+
+function setupSurveyQuestionEvents(index) {
+  // Radio button change handler
+  document.querySelectorAll('input[name="survey-answer"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      survey.answers[index] = parseInt(this.value);
+      document.getElementById('survey-next').disabled = false;
+      
+      // Show finish button if all questions are answered
+      if (survey.answers.length === survey.questions.length && 
+          !survey.answers.includes(undefined)) {
+        finishSurveyBtn.style.display = 'block';
+      }
+    });
+  });
+
+  // Previous button
+  document.getElementById('survey-prev').addEventListener('click', () => {
+    showSurveyQuestion(index - 1);
+  });
+
+  // Next button
+  document.getElementById('survey-next').addEventListener('click', () => {
+    if (index === survey.questions.length - 1) {
+      finishSurveyBtn.style.display = 'block';
+    } else {
+      showSurveyQuestion(index + 1);
+    }
+  });
+}
+
+function completeSurvey() {
+  // Verify all questions are answered
+  if (survey.answers.length !== survey.questions.length || 
+      survey.answers.includes(undefined)) {
+    alert('Please answer all questions before submitting');
+    return;
+  }
+
+  // Award star
+  appData.stars++;
+  updateStars();
+  
+  // Set cooldown
+  survey.cooldownEnd = Date.now() + survey.cooldownDuration;
+  localStorage.setItem('surveyCooldownEnd', survey.cooldownEnd);
+  
+  // Save completion
+  const completionId = Date.now();
+  const completionData = {
+    completionId: completionId,
+    answers: survey.answers,
+    completedAt: new Date().toISOString(),
+    rewardGiven: true
+  };
+  
+  survey.completions.push(completionData);
+  localStorage.setItem('surveyCompletions', JSON.stringify(survey.completions));
+  
+  // Show completion message
+  showSurveyCooldown();
+  
+  // Show reward modal
+  rewardModal.style.display = 'flex';
+}
+
+function showSurveyCooldown() {
+  surveyContainer.style.display = 'none';
+  finishSurveyBtn.style.display = 'none';
+  surveyCooldown.style.display = 'block';
+  startSurveyCooldown(survey.cooldownEnd - Date.now());
+}
+
+// Initialize the survey when the surveys tab is clicked
+document.querySelector('.tab-btn[data-tab="surveys"]').addEventListener('click', initSurvey);
+
+// Initialize finish survey button
+finishSurveyBtn.addEventListener('click', completeSurvey);
+// Event Listeners
+function setupEventListeners() {
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const tabId = this.getAttribute('data-tab');
+      
+      tabBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      contentSections.forEach(section => section.classList.remove('active'));
+      document.getElementById(`${tabId}-section`).classList.add('active');
+      
+      appData.currentTab = tabId;
+      
+      if (tabId === 'surveys') {
+        initSurvey();
+      } else if (tabId === 'kyc') {
+        initKYC();
+      }
+    });
+  });
+
+  setSelectorEl.addEventListener('click', (e) => {
+    if (e.target.classList.contains('set-btn')) {
+      const setId = parseInt(e.target.getAttribute('data-set'));
+      
+      if (appData.cooldownTimers[setId]) {
+        alert('This set is currently in cooldown. Please wait or select another set.');
+        return;
+      }
+      
+      appData.currentSet = setId;
+      localStorage.setItem('currentSet', setId);
+      renderTasks(setId);
+      renderSetSelector();
+    }
+  });
+
+  closeCooldownBtn.addEventListener('click', () => {
+    cooldownOverlay.style.display = 'none';
+    renderSetSelector();
+  });
+
+  closeVerificationModalBtn.addEventListener('click', () => {
+    verificationModal.style.display = 'none';
+    renderTasks(appData.currentSet);
+  });
+
+  finishBtn.addEventListener('click', () => {
+    const currentSet = appData.currentSet;
+    const setData = appData.setData[currentSet];
+    
+    if (checkAllTasksCompleted(currentSet)) {
+      if (!setData.rewardGiven) {
+        appData.stars++;
+        setData.rewardGiven = true;
+        setData.completed = true;
+        setData.completedAt = new Date().toISOString();
+        appData.cooldownTimers[currentSet] = Date.now() + (30 * 60 * 1000);
+        
+        const completionId = Date.now();
+        const completionData = {
+          setId: currentSet,
+          completionId: completionId,
+          completedAt: setData.completedAt,
+          rewardGiven: true
+        };
+        
+        appData.taskCompletions.push(completionData);
+        localStorage.setItem('taskCompletions', JSON.stringify(appData.taskCompletions));
+        
+        localStorage.setItem('stars', appData.stars);
+        localStorage.setItem('setData', JSON.stringify(appData.setData));
+        localStorage.setItem('cooldownTimers', JSON.stringify(appData.cooldownTimers));
+        
+        updateStars();
+        rewardModal.style.display = 'flex';
+        startCooldownTimer(currentSet, 30 * 60 * 1000);
+        renderSetSelector();
+      } else {
+        alert("You've already received your star reward for completing this set!");
+      }
+    } else {
+      const incompleteCount = setData.verifiedTasks.filter(v => !v).length;
+      alert(`Please complete and verify all tasks first! (${incompleteCount} remaining)`);
+    }
+  });
+
+  closeRewardModalBtn.addEventListener('click', () => {
+    rewardModal.style.display = 'none';
+    
+    if (appData.cooldownTimers[appData.currentSet]) {
+      cooldownOverlay.style.display = 'flex';
+    }
+  });
+
+  finishSurveyBtn.addEventListener('click', completeSurvey);
+}
+
+function checkAllTasksCompleted(setId) {
+  return appData.setData[setId].verifiedTasks.every(Boolean);
+}
+
+// Initialize
+window.addEventListener('DOMContentLoaded', init);
+
+</script>
+
+</body>
+</html>
